@@ -45,8 +45,12 @@ def run_research_discovery(topic: str, language: str) -> dict:
         set_json(cache_key, result, CACHE_TTL_SECONDS)
         return result
 
+    # Abstract length (not source count) dominates prompt size and CPU
+    # inference time on a local 3B model -- truncating retains enough of
+    # each abstract for theme classification while cutting tokens sharply.
+    _ABSTRACT_CHAR_CAP = 500
     abstracts_block = "\n\n".join(
-        f"[{i + 1}] {s['title']} ({s.get('year', 'n.d.')})\n{s['abstract']}"
+        f"[{i + 1}] {s['title']} ({s.get('year', 'n.d.')})\n{s['abstract'][:_ABSTRACT_CHAR_CAP]}"
         for i, s in enumerate(usable_sources)
     )
     user_prompt = f"""RESEARCH TOPIC: {topic}
@@ -63,7 +67,7 @@ Respond as JSON:
   "research_gaps": ["string", ...]
 }}"""
 
-    parsed = llm_client.complete_json(SYSTEM_PROMPT, user_prompt, max_tokens=2500)
+    parsed = llm_client.complete_json(SYSTEM_PROMPT, user_prompt, max_tokens=1500)
 
     def attach_sources(items: list[dict]) -> list[dict]:
         for item in items:

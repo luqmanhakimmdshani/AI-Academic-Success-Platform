@@ -44,13 +44,43 @@ interface LitReviewSummary {
   sources: SourceOut[];
 }
 
+interface ResearchHistoryItem {
+  id: string;
+  topic: string;
+  language: string;
+  created_at: string;
+}
+
 export default function ResearchPage() {
   const { t, locale } = useI18n();
   const [topic, setTopic] = useState("");
   const [result, setResult] = useState<LitReviewSummary | null>(null);
+  const [history, setHistory] = useState<ResearchHistoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+
+  const loadHistory = () => {
+    api
+      .get<ResearchHistoryItem[]>("/api/research/history")
+      .then(setHistory)
+      .catch(() => setHistory([]));
+  };
+
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  const openHistoryItem = async (id: string) => {
+    setError(null);
+    try {
+      const res = await api.get<LitReviewSummary>(`/api/research/search/${id}`);
+      setResult(res);
+      setTopic(res.topic);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t("common.error"));
+    }
+  };
 
   const onExport = async () => {
     if (!result) return;
@@ -72,6 +102,7 @@ export default function ResearchPage() {
     try {
       const res = await api.post<LitReviewSummary>("/api/research/search", { topic, language: locale });
       setResult(res);
+      loadHistory();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("common.error"));
     } finally {
@@ -84,29 +115,51 @@ export default function ResearchPage() {
       <PageHeader eyebrow={t("research.eyebrow")} title={t("research.title")} description={t("research.description")} />
 
       <div className="grid gap-5 xl:grid-cols-[0.9fr_1.5fr]">
-        <Card className="h-fit">
-          <div className="flex items-center gap-2 text-sm font-bold text-ink-primary">
-            <Search className="h-4 w-4 text-brand-500" />
-            {t("research.title")}
-          </div>
-          <form onSubmit={onSubmit} className="mt-4">
-            <Label>{t("research.topicLabel")}</Label>
-            <textarea
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder={t("research.placeholder")}
-              required
-              minLength={3}
-              rows={5}
-              className={`${fieldControlClass} resize-none`}
-            />
-            <Button type="submit" loading={loading} className="mt-4 w-full">
-              {!loading && <Sparkles className="h-4 w-4" />}
-              {loading ? t("research.searching") : t("research.submit")}
-            </Button>
-          </form>
-          {error && <p className="mt-3 text-caption text-danger-text">{error}</p>}
-        </Card>
+        <div className="flex flex-col gap-5">
+          <Card className="h-fit">
+            <div className="flex items-center gap-2 text-sm font-bold text-ink-primary">
+              <Search className="h-4 w-4 text-brand-500" />
+              {t("research.title")}
+            </div>
+            <form onSubmit={onSubmit} className="mt-4">
+              <Label>{t("research.topicLabel")}</Label>
+              <textarea
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder={t("research.placeholder")}
+                required
+                minLength={3}
+                rows={5}
+                className={`${fieldControlClass} resize-none`}
+              />
+              <Button type="submit" loading={loading} className="mt-4 w-full">
+                {!loading && <Sparkles className="h-4 w-4" />}
+                {loading ? t("research.searching") : t("research.submit")}
+              </Button>
+            </form>
+            {error && <p className="mt-3 text-caption text-danger-text">{error}</p>}
+          </Card>
+
+          <Card className="h-fit">
+            <span className="text-sm font-bold text-ink-primary">{t("research.history")}</span>
+            <div className="mt-3 space-y-1.5">
+              {history.length === 0 && <p className="text-caption text-ink-tertiary">{t("research.noHistory")}</p>}
+              {history.map((h) => (
+                <button
+                  key={h.id}
+                  onClick={() => openHistoryItem(h.id)}
+                  className={
+                    "block w-full min-w-0 rounded-lg px-2.5 py-2 text-left text-caption transition-colors " +
+                    (h.id === result?.id ? "bg-brand-tint text-brand-700" : "text-ink-secondary hover:bg-surface-sunken")
+                  }
+                >
+                  <span className="block truncate font-medium">{h.topic}</span>
+                  <span className="block text-[11px] text-ink-tertiary">{new Date(h.created_at).toLocaleDateString()}</span>
+                </button>
+              ))}
+            </div>
+          </Card>
+        </div>
 
         <Card className="min-h-[420px]">
           {loading ? (

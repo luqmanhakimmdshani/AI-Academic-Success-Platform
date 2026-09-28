@@ -4,13 +4,28 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import get_current_user
 from app.models import LitReviewSummary, SearchQuery, User
-from app.schemas import LitReviewSummaryOut, ResearchSearchRequest
+from app.schemas import LitReviewSummaryOut, ResearchHistoryItemOut, ResearchSearchRequest
 from app.services.research_service import run_research_discovery
 from app.services.source_service import build_reference_docx
 
 router = APIRouter(prefix="/api/research", tags=["research"])
 
 _DOCX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+
+@router.get("/history", response_model=list[ResearchHistoryItemOut])
+def list_history(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    queries = (
+        db.query(SearchQuery)
+        .filter(SearchQuery.user_id == current_user.id)
+        .order_by(SearchQuery.created_at.desc())
+        .all()
+    )
+    return [
+        ResearchHistoryItemOut(id=q.summary.id, topic=q.topic_text, language=q.language, created_at=q.created_at)
+        for q in queries
+        if q.summary
+    ]
 
 
 @router.post("/search", response_model=LitReviewSummaryOut)

@@ -80,7 +80,9 @@
     "noAbstracts": "Kami menemui sumber tetapi tidak dapat memperoleh cukup teks abstrak untuk meringkaskannya. Lihat senarai sumber di bawah.",
     "copyApa": "Salin petikan APA",
     "copied": "Disalin!",
-    "exportWord": "Eksport sebagai Word"
+    "exportWord": "Eksport sebagai Word",
+    "history": "Carian Lepas",
+    "noHistory": "Belum ada carian lepas"
   },
   "integrity": {
     "eyebrow": "02 · Integriti akademik",
@@ -108,15 +110,16 @@
     "description": "Tampal perenggan atau abstrak untuk mendapat maklum balas berstruktur. Kami tidak akan menulis semula untuk anda -- kerja anda kekal milik anda.",
     "placeholder": "Tampal draf perenggan atau abstrak anda di sini...",
     "submit": "Dapatkan maklum balas",
-    "sessionOnly": "Sesi sahaja",
     "integrityNote": "Integriti mengikut reka bentuk:",
-    "integrityNoteBody": "Kami tidak sesekali menulis semula teks anda dan tidak menyimpan draf anda selepas sesi ini.",
+    "integrityNoteBody": "Kami tidak sesekali menulis semula teks anda -- maklum balas sahaja, dalam kata-kata anda sendiri.",
     "emptyTitle": "Jurulatih, bukan penulis hantu",
     "empty": "Lihat dengan tepat di mana hujah, bukti dan aliran ayat anda boleh diperkukuh.",
     "clarity": "Kejelasan Hujah",
     "citationGaps": "Jurang Petikan",
     "grammar": "Tatabahasa",
-    "suggestions": "Cadangan"
+    "suggestions": "Cadangan",
+    "history": "Maklum Balas Lepas",
+    "noHistory": "Belum ada draf lepas"
   },
   "sources": {
     "eyebrow": "04 · Penyusun sumber",
@@ -133,7 +136,9 @@
       "unknown": "Tidak diketahui"
     },
     "unresolved": "Tidak dapat menyelesaikan entri ini",
-    "exportWord": "Eksport sebagai Word"
+    "exportWord": "Eksport sebagai Word",
+    "history": "Senarai Lepas",
+    "noHistory": "Belum ada senarai rujukan lepas"
   },
   "admin": {
     "eyebrow": "Alatan institusi",

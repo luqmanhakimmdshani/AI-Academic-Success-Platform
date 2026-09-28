@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { Download, FileText, Link2, Sparkles } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -32,6 +32,13 @@ interface ReferenceListOut {
   entries: ReferenceEntryOut[];
 }
 
+interface ReferenceListHistoryItem {
+  id: string;
+  title: string;
+  entry_count: number;
+  created_at: string;
+}
+
 const TIER_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> = {
   peer_reviewed: "success",
   grey_literature: "warning",
@@ -43,9 +50,31 @@ export default function SourcesPage() {
   const { t, locale } = useI18n();
   const [raw, setRaw] = useState("");
   const [result, setResult] = useState<ReferenceListOut | null>(null);
+  const [history, setHistory] = useState<ReferenceListHistoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+
+  const loadHistory = () => {
+    api
+      .get<ReferenceListHistoryItem[]>("/api/sources/history")
+      .then(setHistory)
+      .catch(() => setHistory([]));
+  };
+
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  const openHistoryItem = async (id: string) => {
+    setError(null);
+    try {
+      const res = await api.get<ReferenceListOut>(`/api/sources/${id}`);
+      setResult(res);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t("common.error"));
+    }
+  };
 
   const onExport = async () => {
     if (!result) return;
@@ -72,6 +101,7 @@ export default function SourcesPage() {
     try {
       const res = await api.post<ReferenceListOut>("/api/sources/organize", { entries, language: locale });
       setResult(res);
+      loadHistory();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("common.error"));
     } finally {
@@ -84,30 +114,52 @@ export default function SourcesPage() {
       <PageHeader eyebrow={t("sources.eyebrow")} title={t("sources.title")} description={t("sources.description")} />
 
       <div className="grid gap-5 xl:grid-cols-[0.9fr_1.4fr]">
-        <Card className="h-fit">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm font-bold text-ink-primary">
-              <Link2 className="h-4 w-4 text-ink-secondary" />
-              {t("sources.title")}
+        <div className="flex flex-col gap-5">
+          <Card className="h-fit">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-bold text-ink-primary">
+                <Link2 className="h-4 w-4 text-ink-secondary" />
+                {t("sources.title")}
+              </div>
+              <span className="text-caption text-ink-tertiary">one per line</span>
             </div>
-            <span className="text-caption text-ink-tertiary">one per line</span>
-          </div>
-          <form onSubmit={onSubmit} className="mt-4">
-            <textarea
-              value={raw}
-              onChange={(e) => setRaw(e.target.value)}
-              placeholder={t("sources.placeholder")}
-              required
-              rows={8}
-              className={`${fieldControlClass} resize-y`}
-            />
-            <Button type="submit" loading={loading} className="mt-4 w-full">
-              {!loading && <Sparkles className="h-4 w-4" />}
-              {t("sources.submit")}
-            </Button>
-          </form>
-          {error && <p className="mt-3 text-caption text-danger-text">{error}</p>}
-        </Card>
+            <form onSubmit={onSubmit} className="mt-4">
+              <textarea
+                value={raw}
+                onChange={(e) => setRaw(e.target.value)}
+                placeholder={t("sources.placeholder")}
+                required
+                rows={8}
+                className={`${fieldControlClass} resize-y`}
+              />
+              <Button type="submit" loading={loading} className="mt-4 w-full">
+                {!loading && <Sparkles className="h-4 w-4" />}
+                {t("sources.submit")}
+              </Button>
+            </form>
+            {error && <p className="mt-3 text-caption text-danger-text">{error}</p>}
+          </Card>
+
+          <Card className="h-fit">
+            <span className="text-sm font-bold text-ink-primary">{t("sources.history")}</span>
+            <div className="mt-3 space-y-1.5">
+              {history.length === 0 && <p className="text-caption text-ink-tertiary">{t("sources.noHistory")}</p>}
+              {history.map((h) => (
+                <button
+                  key={h.id}
+                  onClick={() => openHistoryItem(h.id)}
+                  className={
+                    "block w-full min-w-0 rounded-lg px-2.5 py-2 text-left text-caption transition-colors " +
+                    (h.id === result?.id ? "bg-brand-tint text-brand-700" : "text-ink-secondary hover:bg-surface-sunken")
+                  }
+                >
+                  <span className="block truncate font-medium">{h.title}</span>
+                  <span className="block text-[11px] text-ink-tertiary">{new Date(h.created_at).toLocaleDateString()}</span>
+                </button>
+              ))}
+            </div>
+          </Card>
+        </div>
 
         <Card className="min-h-[420px]">
           {!result ? (

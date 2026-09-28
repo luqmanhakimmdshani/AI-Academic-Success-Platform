@@ -127,7 +127,7 @@ def _reconstruct_abstract(inverted_index: dict | None) -> str:
     return " ".join(positions[i] for i in sorted(positions))
 
 
-def search_all_sources(topic: str, limit_per_source: int = 8) -> list[dict]:
+def search_all_sources(topic: str, limit_per_source: int = 6) -> list[dict]:
     # The three providers are independent network calls -- run them
     # concurrently rather than one after another (each has its own 10s
     # timeout, so sequential was up to 3x slower in the worst case).

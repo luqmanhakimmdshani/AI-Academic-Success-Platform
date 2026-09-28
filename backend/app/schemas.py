@@ -78,6 +78,13 @@ class LitReviewSummaryOut(BaseModel):
         from_attributes = True
 
 
+class ResearchHistoryItemOut(BaseModel):
+    id: uuid.UUID
+    topic: str
+    language: str
+    created_at: datetime
+
+
 # --- Academic Integrity Advisor ---
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=1000)
@@ -121,6 +128,13 @@ class WritingFeedbackOut(BaseModel):
     suggestions: list[str]
 
 
+class WritingHistoryItemOut(BaseModel):
+    draft_id: uuid.UUID
+    preview: str
+    language: str
+    submitted_at: datetime
+
+
 # --- Source Organiser ---
 class SourceOrganiseRequest(BaseModel):
     entries: list[str] = Field(min_length=1, max_length=20)
@@ -144,6 +158,13 @@ class ReferenceListOut(BaseModel):
     id: uuid.UUID
     title: str
     entries: list[ReferenceEntryOut]
+
+
+class ReferenceListHistoryItemOut(BaseModel):
+    id: uuid.UUID
+    title: str
+    entry_count: int
+    created_at: datetime
 
 
 # --- Admin: Policy documents ---

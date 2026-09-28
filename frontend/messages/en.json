@@ -80,7 +80,9 @@
     "noAbstracts": "We found sources but couldn't retrieve enough abstract text to summarise them. See the source list below.",
     "copyApa": "Copy APA citation",
     "copied": "Copied!",
-    "exportWord": "Export as Word"
+    "exportWord": "Export as Word",
+    "history": "Past Searches",
+    "noHistory": "No past searches yet"
   },
   "integrity": {
     "eyebrow": "02 · Academic integrity",
@@ -108,15 +110,16 @@
     "description": "Paste a paragraph or abstract for structured feedback. We will not rewrite it for you -- your work stays your own.",
     "placeholder": "Paste your draft paragraph or abstract here...",
     "submit": "Get feedback",
-    "sessionOnly": "Session-only",
     "integrityNote": "Integrity by design:",
-    "integrityNoteBody": "We never rewrite your text and do not retain your draft after this session.",
+    "integrityNoteBody": "We never rewrite your text -- feedback only, in your own words.",
     "emptyTitle": "A coach, not a ghostwriter",
     "empty": "See exactly where your reasoning, evidence and sentence flow can become stronger.",
     "clarity": "Argument Clarity",
     "citationGaps": "Citation Gaps",
     "grammar": "Grammar",
-    "suggestions": "Suggestions"
+    "suggestions": "Suggestions",
+    "history": "Past Feedback",
+    "noHistory": "No past drafts yet"
   },
   "sources": {
     "eyebrow": "04 · Source organiser",
@@ -133,7 +136,9 @@
       "unknown": "Unknown"
     },
     "unresolved": "Could not resolve this entry",
-    "exportWord": "Export as Word"
+    "exportWord": "Export as Word",
+    "history": "Past Lists",
+    "noHistory": "No past reference lists yet"
   },
   "admin": {
     "eyebrow": "Institution tools",
